@@ -22,12 +22,24 @@ public class Prescription {
     
     @Field("patient_id")
     private String patientId;
+    
+    @Field("diagnosis")
+    private String diagnosis;
 
     @Field("medicines")
     private String medicines;
+    
+    @Field("dosage_instructions")
+    private String dosageInstructions;
+    
+    @Field("duration")
+    private String duration;
 
     @Field("notes")
     private String notes;
+    
+    @Field("prescribed_date")
+    private LocalDateTime prescribedDate;
 
     @Field("created_at")
     private LocalDateTime createdAt;

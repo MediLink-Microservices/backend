@@ -22,9 +22,14 @@ public class DoctorService {
         Doctor doctor = Doctor.builder()
                 .name(doctorRequestDTO.getName())
                 .email(doctorRequestDTO.getEmail())
+                .phone(doctorRequestDTO.getPhone())
+                .licenseNumber(doctorRequestDTO.getLicenseNumber())
+                .yearsOfExperience(doctorRequestDTO.getYearsOfExperience())
                 .specialty(doctorRequestDTO.getSpecialty())
-                .hospital(doctorRequestDTO.getHospital())
+                .workLocations(doctorRequestDTO.getWorkLocations())
                 .fee(doctorRequestDTO.getFee())
+                .availableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine() != null ? 
+                    doctorRequestDTO.getAvailableForTelemedicine() : false)
                 .status(DoctorStatus.PENDING)
                 .build();
 
@@ -56,9 +61,13 @@ public class DoctorService {
 
         existingDoctor.setName(doctorRequestDTO.getName());
         existingDoctor.setEmail(doctorRequestDTO.getEmail());
+        existingDoctor.setPhone(doctorRequestDTO.getPhone());
+        existingDoctor.setLicenseNumber(doctorRequestDTO.getLicenseNumber());
+        existingDoctor.setYearsOfExperience(doctorRequestDTO.getYearsOfExperience());
         existingDoctor.setSpecialty(doctorRequestDTO.getSpecialty());
-        existingDoctor.setHospital(doctorRequestDTO.getHospital());
+        existingDoctor.setWorkLocations(doctorRequestDTO.getWorkLocations());
         existingDoctor.setFee(doctorRequestDTO.getFee());
+        existingDoctor.setAvailableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine());
 
         Doctor updatedDoctor = doctorRepository.save(existingDoctor);
         return convertToResponseDTO(updatedDoctor);
@@ -85,9 +94,13 @@ public class DoctorService {
                 .doctorId(doctor.getDoctorId())
                 .name(doctor.getName())
                 .email(doctor.getEmail())
+                .phone(doctor.getPhone())
+                .licenseNumber(doctor.getLicenseNumber())
+                .yearsOfExperience(doctor.getYearsOfExperience())
                 .specialty(doctor.getSpecialty())
-                .hospital(doctor.getHospital())
+                .workLocations(doctor.getWorkLocations())
                 .fee(doctor.getFee())
+                .availableForTelemedicine(doctor.getAvailableForTelemedicine())
                 .status(doctor.getStatus())
                 .build();
     }

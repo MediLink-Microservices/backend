@@ -10,7 +10,11 @@ public class PrescriptionDTO {
     private String prescriptionId;
     private String doctorId;
     private String patientId;
+    private String diagnosis;
     private String medicines;
+    private String dosageInstructions;
+    private String duration;
     private String notes;
+    private LocalDateTime prescribedDate;
     private LocalDateTime createdAt;
 }
