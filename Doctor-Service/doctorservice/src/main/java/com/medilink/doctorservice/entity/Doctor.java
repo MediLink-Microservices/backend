@@ -35,8 +35,8 @@ public class Doctor {
     @Field("specialty")
     private String specialty;
     
-    @Field("work_locations")
-    private List<String> workLocations; // Multiple hospitals/clinics
+    @Field("hospital_ids")
+    private List<String> hospitalIds; // References to Hospital documents
     
     @Field("fee")
     private Double fee;

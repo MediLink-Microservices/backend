@@ -15,7 +15,7 @@ public class DoctorResponseDTO {
     private String licenseNumber;
     private Integer yearsOfExperience;
     private String specialty;
-    private List<String> workLocations;
+    private List<String> hospitalIds;
     private Double fee;
     private Boolean availableForTelemedicine;
     private DoctorStatus status;

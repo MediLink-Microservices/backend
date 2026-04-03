@@ -30,8 +30,8 @@ public class DoctorRequestDTO {
     @Size(min = 2, max = 50, message = "Specialty must be between 2 and 50 characters")
     private String specialty;
 
-    @NotEmpty(message = "At least one work location is required")
-    private List<String> workLocations;
+    @NotEmpty(message = "At least one hospital is required")
+    private List<String> hospitalIds;
 
     @Positive(message = "Consultation fee must be positive")
     private Double fee;

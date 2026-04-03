@@ -26,7 +26,7 @@ public class DoctorService {
                 .licenseNumber(doctorRequestDTO.getLicenseNumber())
                 .yearsOfExperience(doctorRequestDTO.getYearsOfExperience())
                 .specialty(doctorRequestDTO.getSpecialty())
-                .workLocations(doctorRequestDTO.getWorkLocations())
+                .hospitalIds(doctorRequestDTO.getHospitalIds())
                 .fee(doctorRequestDTO.getFee())
                 .availableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine() != null ? 
                     doctorRequestDTO.getAvailableForTelemedicine() : false)
@@ -65,7 +65,7 @@ public class DoctorService {
         existingDoctor.setLicenseNumber(doctorRequestDTO.getLicenseNumber());
         existingDoctor.setYearsOfExperience(doctorRequestDTO.getYearsOfExperience());
         existingDoctor.setSpecialty(doctorRequestDTO.getSpecialty());
-        existingDoctor.setWorkLocations(doctorRequestDTO.getWorkLocations());
+        existingDoctor.setHospitalIds(doctorRequestDTO.getHospitalIds());
         existingDoctor.setFee(doctorRequestDTO.getFee());
         existingDoctor.setAvailableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine());
 
@@ -89,6 +89,22 @@ public class DoctorService {
         doctorRepository.deleteById(doctorId);
     }
 
+    public List<DoctorResponseDTO> getDoctorsByHospital(String hospitalId) {
+        return doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getHospitalIds() != null && 
+                    doctor.getHospitalIds().contains(hospitalId))
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<DoctorResponseDTO> getDoctorsByCity(String city) {
+        // This would require hospital lookup - for now return all doctors
+        // In a real implementation, you'd join with hospitals
+        return doctorRepository.findAll().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     private DoctorResponseDTO convertToResponseDTO(Doctor doctor) {
         return DoctorResponseDTO.builder()
                 .doctorId(doctor.getDoctorId())
@@ -98,7 +114,7 @@ public class DoctorService {
                 .licenseNumber(doctor.getLicenseNumber())
                 .yearsOfExperience(doctor.getYearsOfExperience())
                 .specialty(doctor.getSpecialty())
-                .workLocations(doctor.getWorkLocations())
+                .hospitalIds(doctor.getHospitalIds())
                 .fee(doctor.getFee())
                 .availableForTelemedicine(doctor.getAvailableForTelemedicine())
                 .status(doctor.getStatus())
