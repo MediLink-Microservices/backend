@@ -1,6 +1,7 @@
 package com.medilink.doctorservice.repository;
 
 import com.medilink.doctorservice.entity.Hospital;
+import com.medilink.doctorservice.entity.HospitalType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -25,25 +25,25 @@ public class PrescriptionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PrescriptionDTO> getById(@PathVariable String id) {
+    public ResponseEntity<PrescriptionDTO> getPrescriptionById(@PathVariable String id) {
         PrescriptionDTO prescription = service.getPrescriptionById(id);
         return ResponseEntity.ok(prescription);
     }
 
     @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<PrescriptionDTO>> getByPatientId(@PathVariable String patientId) {
-        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByPatient(patientId);
+    public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByPatientId(@PathVariable String patientId) {
+        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByPatientId(patientId);
         return ResponseEntity.ok(prescriptions);
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<PrescriptionDTO>> getByDoctorId(@PathVariable String doctorId) {
-        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByDoctor(doctorId);
+    public ResponseEntity<List<PrescriptionDTO>> getPrescriptionsByDoctorId(@PathVariable String doctorId) {
+        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByDoctorId(doctorId);
         return ResponseEntity.ok(prescriptions);
     }
 
     @GetMapping
-    public ResponseEntity<List<PrescriptionDTO>> getAll() {
+    public ResponseEntity<List<PrescriptionDTO>> getAllPrescriptions() {
         List<PrescriptionDTO> prescriptions = service.getAllPrescriptions();
         return ResponseEntity.ok(prescriptions);
     }
