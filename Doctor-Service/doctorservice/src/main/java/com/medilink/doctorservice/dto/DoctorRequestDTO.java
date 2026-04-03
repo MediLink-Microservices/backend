@@ -1,9 +1,10 @@
-package com.healthcare.doctor_service.dto;
+package com.medilink.doctorservice.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class DoctorRequestDTO {
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -21,5 +22,5 @@ public class DoctorRequestDTO {
     private String hospital;
 
     @Positive(message = "Consultation fee must be positive")
-    private Double consultationFee;
+    private Double fee;
 }

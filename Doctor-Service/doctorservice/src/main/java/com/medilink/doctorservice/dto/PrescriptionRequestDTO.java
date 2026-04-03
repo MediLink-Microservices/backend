@@ -1,17 +1,16 @@
-package com.healthcare.doctor_service.dto;
+package com.medilink.doctorservice.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class PrescriptionRequestDTO {
-    @NotNull(message = "Doctor ID is required")
-    @Positive(message = "Doctor ID must be positive")
-    private Long doctorId;
+    @NotBlank(message = "Doctor ID is required")
+    private String doctorId;
 
-    @NotNull(message = "Patient ID is required")
-    @Positive(message = "Patient ID must be positive")
-    private Long patientId;
+    @NotBlank(message = "Patient ID is required")
+    private String patientId;
 
     @NotBlank(message = "Medicines are required")
     @Size(max = 1000, message = "Medicines field must not exceed 1000 characters")

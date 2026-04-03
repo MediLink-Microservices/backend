@@ -1,15 +1,16 @@
-package com.healthcare.doctor_service.dto;
+package com.medilink.doctorservice.dto;
 
-import com.healthcare.doctor_service.entity.DoctorStatus;
+import com.medilink.doctorservice.entity.DoctorStatus;
 import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class DoctorResponseDTO {
-    private Long doctorId;
+    private String doctorId;
     private String name;
     private String email;
     private String specialty;
     private String hospital;
-    private Double consultationFee;
+    private Double fee;
     private DoctorStatus status;
 }
