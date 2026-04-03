@@ -32,13 +32,13 @@ public class PrescriptionController {
 
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<PrescriptionDTO>> getByPatientId(@PathVariable String patientId) {
-        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByPatientId(patientId);
+        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByPatient(patientId);
         return ResponseEntity.ok(prescriptions);
     }
 
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<PrescriptionDTO>> getByDoctorId(@PathVariable String doctorId) {
-        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByDoctorId(doctorId);
+        List<PrescriptionDTO> prescriptions = service.getPrescriptionsByDoctor(doctorId);
         return ResponseEntity.ok(prescriptions);
     }
 
@@ -49,7 +49,7 @@ public class PrescriptionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> deletePrescription(@PathVariable String id) {
         service.deletePrescription(id);
         return ResponseEntity.noContent().build();
     }
