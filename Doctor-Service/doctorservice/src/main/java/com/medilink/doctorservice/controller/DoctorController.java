@@ -65,13 +65,25 @@ public class DoctorController {
 
     @PutMapping("/{id}/reject")
     public ResponseEntity<DoctorResponseDTO> rejectDoctor(@PathVariable String id) {
-        DoctorResponseDTO updatedDoctor = service.updateDoctorStatus(id, DoctorStatus.REJECTED);
+        DoctorResponseDTO updatedDoctor = doctorService.updateDoctorStatus(id, DoctorStatus.REJECTED);
         return ResponseEntity.ok(updatedDoctor);
     }
 
+    @GetMapping("/hospital/{hospitalId}")
+    public ResponseEntity<List<DoctorResponseDTO>> getDoctorsByHospital(@PathVariable String hospitalId) {
+        List<DoctorResponseDTO> doctors = doctorService.getDoctorsByHospital(hospitalId);
+        return ResponseEntity.ok(doctors);
+    }
+
+    @GetMapping("/city/{city}")
+    public ResponseEntity<List<DoctorResponseDTO>> getDoctorsByCity(@PathVariable String city) {
+        List<DoctorResponseDTO> doctors = doctorService.getDoctorsByCity(city);
+        return ResponseEntity.ok(doctors);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.deleteDoctor(id);
+    public ResponseEntity<Void> deleteDoctor(@PathVariable String id) {
+        doctorService.deleteDoctor(id);
         return ResponseEntity.noContent().build();
     }
 }

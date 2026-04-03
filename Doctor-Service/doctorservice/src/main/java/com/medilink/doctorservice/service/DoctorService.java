@@ -22,9 +22,14 @@ public class DoctorService {
         Doctor doctor = Doctor.builder()
                 .name(doctorRequestDTO.getName())
                 .email(doctorRequestDTO.getEmail())
+                .phone(doctorRequestDTO.getPhone())
+                .licenseNumber(doctorRequestDTO.getLicenseNumber())
+                .yearsOfExperience(doctorRequestDTO.getYearsOfExperience())
                 .specialty(doctorRequestDTO.getSpecialty())
-                .hospital(doctorRequestDTO.getHospital())
+                .hospitalIds(doctorRequestDTO.getHospitalIds())
                 .fee(doctorRequestDTO.getFee())
+                .availableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine() != null ? 
+                    doctorRequestDTO.getAvailableForTelemedicine() : false)
                 .status(DoctorStatus.PENDING)
                 .build();
 
@@ -56,9 +61,13 @@ public class DoctorService {
 
         existingDoctor.setName(doctorRequestDTO.getName());
         existingDoctor.setEmail(doctorRequestDTO.getEmail());
+        existingDoctor.setPhone(doctorRequestDTO.getPhone());
+        existingDoctor.setLicenseNumber(doctorRequestDTO.getLicenseNumber());
+        existingDoctor.setYearsOfExperience(doctorRequestDTO.getYearsOfExperience());
         existingDoctor.setSpecialty(doctorRequestDTO.getSpecialty());
-        existingDoctor.setHospital(doctorRequestDTO.getHospital());
+        existingDoctor.setHospitalIds(doctorRequestDTO.getHospitalIds());
         existingDoctor.setFee(doctorRequestDTO.getFee());
+        existingDoctor.setAvailableForTelemedicine(doctorRequestDTO.getAvailableForTelemedicine());
 
         Doctor updatedDoctor = doctorRepository.save(existingDoctor);
         return convertToResponseDTO(updatedDoctor);
@@ -80,14 +89,34 @@ public class DoctorService {
         doctorRepository.deleteById(doctorId);
     }
 
+    public List<DoctorResponseDTO> getDoctorsByHospital(String hospitalId) {
+        return doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getHospitalIds() != null && 
+                    doctor.getHospitalIds().contains(hospitalId))
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<DoctorResponseDTO> getDoctorsByCity(String city) {
+        // This would require hospital lookup - for now return all doctors
+        // In a real implementation, you'd join with hospitals
+        return doctorRepository.findAll().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     private DoctorResponseDTO convertToResponseDTO(Doctor doctor) {
         return DoctorResponseDTO.builder()
                 .doctorId(doctor.getDoctorId())
                 .name(doctor.getName())
                 .email(doctor.getEmail())
+                .phone(doctor.getPhone())
+                .licenseNumber(doctor.getLicenseNumber())
+                .yearsOfExperience(doctor.getYearsOfExperience())
                 .specialty(doctor.getSpecialty())
-                .hospital(doctor.getHospital())
+                .hospitalIds(doctor.getHospitalIds())
                 .fee(doctor.getFee())
+                .availableForTelemedicine(doctor.getAvailableForTelemedicine())
                 .status(doctor.getStatus())
                 .build();
     }

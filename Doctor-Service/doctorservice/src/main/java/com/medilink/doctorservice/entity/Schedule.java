@@ -27,6 +27,15 @@ public class Schedule {
     @Field("end_time")
     private String endTime;
     
+    @Field("location")
+    private String location;
+    
+    @Field("consultation_type")
+    private String consultationType; // IN_PERSON, ONLINE, BOTH
+    
+    @Field("is_available")
+    private Boolean isAvailable;
+    
     @Field("patient_limit")
     private Integer patientLimit;
 }

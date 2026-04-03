@@ -25,6 +25,17 @@ public class ScheduleDTO {
     @Pattern(regexp = "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", 
              message = "End time must be in HH:MM format")
     private String endTime;
+    
+    @NotBlank(message = "Location is required")
+    private String location;
+    
+    @NotBlank(message = "Consultation type is required")
+    @Pattern(regexp = "^(IN_PERSON|ONLINE|BOTH)$", 
+             message = "Consultation type must be IN_PERSON, ONLINE, or BOTH")
+    private String consultationType;
+    
+    @NotNull(message = "Availability status is required")
+    private Boolean isAvailable;
 
     @NotNull(message = "Patient limit is required")
     @Positive(message = "Patient limit must be positive")
