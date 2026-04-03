@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongo-auth:
+    image: mongo:7.0
+    container_name: mongo-auth
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: auth_db
+    volumes:
+      - mongo-auth-data:/data/db
+    networks:
+      - healthcare-network
+
+  redis-auth:
+    image: redis:7.2-alpine
+    container_name: redis-auth
+    ports:
+      - "6379:6379"
+    networks:
+      - healthcare-network
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo-auth
+      - redis-auth
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongo-auth
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: admin123
+      SPRING_DATA_REDIS_HOST: redis-auth
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
+
+volumes:
+  mongo-auth-data:
