@@ -26,11 +26,12 @@
         
         <!-- Member 3 -->
         <module>appointment-service</module>
-        <module>payment-service</module>
+
 
         <!-- Member 4 -->
         <module>patient-service</module>
         <module>notification-service</module>
+        <module>telemedicine-service</module>
     </modules>
 
 </project>
