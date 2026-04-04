@@ -20,6 +20,8 @@ public class PatientProfile {
 
     @Id
     private String id; // Unique ID (MongoDB ObjectId)
+
+    private String NIC;
     
     private String firstName;
     private String lastName;
