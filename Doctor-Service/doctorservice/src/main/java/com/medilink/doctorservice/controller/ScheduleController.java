@@ -35,6 +35,12 @@ public class ScheduleController {
         return ResponseEntity.ok(schedules);
     }
 
+    @GetMapping("/hospital/{hospitalId}")
+    public ResponseEntity<List<ScheduleDTO>> getByHospitalId(@PathVariable String hospitalId) {
+        List<ScheduleDTO> schedules = service.getSchedulesByHospitalId(hospitalId);
+        return ResponseEntity.ok(schedules);
+    }
+
     @GetMapping
     public ResponseEntity<List<ScheduleDTO>> getAll() {
         List<ScheduleDTO> schedules = service.getAllSchedules();

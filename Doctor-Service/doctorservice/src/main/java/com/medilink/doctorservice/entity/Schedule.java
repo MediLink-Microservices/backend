@@ -18,6 +18,9 @@ public class Schedule {
     @Field("doctor_id")
     private String doctorId;
     
+    @Field("hospital_id")
+    private String hospitalId;
+    
     @Field("day")
     private String day;
     
@@ -26,9 +29,6 @@ public class Schedule {
     
     @Field("end_time")
     private String endTime;
-    
-    @Field("location")
-    private String location;
     
     @Field("consultation_type")
     private String consultationType; // IN_PERSON, ONLINE, BOTH
