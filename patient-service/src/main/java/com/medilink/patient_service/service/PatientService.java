@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.List;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,14 @@ public class PatientService {
 
     @Autowired
     private Cloudinary cloudinary;
+
+
+    /**
+     * Retrieves all patient profiles.
+     */
+    public List<PatientProfile> findAll() {
+        return patientRepository.findAll();
+    }
 
     /**
      * Finds a patient by their ID.
@@ -70,4 +79,6 @@ public class PatientService {
         patient.getMedicalReports().add(record);
         return patientRepository.save(patient);
     }
+
+
 }
