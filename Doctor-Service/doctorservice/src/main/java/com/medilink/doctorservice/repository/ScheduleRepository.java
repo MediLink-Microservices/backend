@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends MongoRepository<Schedule, String> {
     List<Schedule> findByDoctorId(String doctorId);
+    List<Schedule> findByHospitalId(String hospitalId);
 }

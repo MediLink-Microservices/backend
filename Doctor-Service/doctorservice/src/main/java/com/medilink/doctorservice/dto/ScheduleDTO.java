@@ -11,6 +11,9 @@ public class ScheduleDTO {
     @NotBlank(message = "Doctor ID is required")
     private String doctorId;
 
+    @NotBlank(message = "Hospital ID is required")
+    private String hospitalId;
+
     @NotBlank(message = "Day is required")
     @Pattern(regexp = "^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$", 
              message = "Day must be a valid day of the week")
@@ -26,12 +29,9 @@ public class ScheduleDTO {
              message = "End time must be in HH:MM format")
     private String endTime;
     
-    @NotBlank(message = "Location is required")
-    private String location;
-    
     @NotBlank(message = "Consultation type is required")
-    @Pattern(regexp = "^(IN_PERSON|ONLINE|BOTH)$", 
-             message = "Consultation type must be IN_PERSON, ONLINE, or BOTH")
+    @Pattern(regexp = "^(IN_PERSON|ONLINE|BOTH|TELEMEDICINE)$", 
+             message = "Consultation type must be IN_PERSON, ONLINE, BOTH, or TELEMEDICINE")
     private String consultationType;
     
     @NotNull(message = "Availability status is required")
