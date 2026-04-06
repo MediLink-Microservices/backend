@@ -1,12 +1,14 @@
 package com.medilink.patient_service.controller;
 
 import com.medilink.patient_service.model.PatientProfile;
+import com.medilink.patient_service.repository.PatientRepository;
 import com.medilink.patient_service.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +21,24 @@ public class PatientController {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    /**
+     * Get all patients.
+     */
+    @GetMapping
+    public ResponseEntity<List<PatientProfile>> getAllPatients() {
+        return ResponseEntity.ok(patientService.findAll());
+    }
+    /**
+     * Retrieves all patient profiles.
+     */
+    public List<PatientProfile> findAll() {
+        return patientRepository.findAll();
+    }
+
 
     /**
      * Get a patient by ID.
