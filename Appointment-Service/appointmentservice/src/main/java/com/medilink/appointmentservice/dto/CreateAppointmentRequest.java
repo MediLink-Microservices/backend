@@ -19,13 +19,10 @@ public class CreateAppointmentRequest {
     @NotBlank
     private String doctorId;
 
-    @NotBlank
     private String doctorName;
 
-    @NotBlank
     private String doctorSpecialty;
 
-    @NotBlank
     private String doctorHospital;
 
     @DecimalMin("0.0")
