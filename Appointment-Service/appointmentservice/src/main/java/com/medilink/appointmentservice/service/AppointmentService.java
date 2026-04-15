@@ -1,9 +1,5 @@
 package com.medilink.appointmentservice.service;
 
-import com.medilink.appointmentservice.client.DoctorServiceClient;
-import com.medilink.appointmentservice.client.PatientServiceClient;
-import com.medilink.appointmentservice.client.dto.DoctorDetails;
-import com.medilink.appointmentservice.client.dto.PatientDetails;
 import com.medilink.appointmentservice.dto.CreateAppointmentRequest;
 import com.medilink.appointmentservice.model.Appointment;
 import com.medilink.appointmentservice.model.AppointmentStatus;
@@ -19,52 +15,26 @@ public class AppointmentService {
     private static final int DEFAULT_DURATION_MINUTES = 30;
 
     private final AppointmentRepository appointmentRepository;
-    private final PatientServiceClient patientServiceClient;
-    private final DoctorServiceClient doctorServiceClient;
 
-    public AppointmentService(
-            AppointmentRepository appointmentRepository,
-            PatientServiceClient patientServiceClient,
-            DoctorServiceClient doctorServiceClient) {
+    public AppointmentService(AppointmentRepository appointmentRepository) {
         this.appointmentRepository = appointmentRepository;
-        this.patientServiceClient = patientServiceClient;
-        this.doctorServiceClient = doctorServiceClient;
     }
 
     public Appointment createAppointment(CreateAppointmentRequest request) {
-        PatientDetails patient = patientServiceClient.getPatientById(request.getPatientId());
-        DoctorDetails doctor = doctorServiceClient.getDoctorById(request.getDoctorId());
-
-        if (patient == null || patient.getId() == null || patient.getId().isBlank()) {
-            throw new IllegalArgumentException("Patient not found or unavailable.");
-        }
-        if (doctor == null || doctor.getDoctorId() == null || doctor.getDoctorId().isBlank()) {
-            throw new IllegalArgumentException("Doctor not found or unavailable.");
-        }
-
         LocalDateTime startTime = request.getAppointmentDateTime();
         LocalDateTime endTime = startTime.plusMinutes(DEFAULT_DURATION_MINUTES);
-
-        boolean doctorHasClash = !appointmentRepository
-                .findByDoctorIdAndAppointmentDateTimeBetween(
-                        request.getDoctorId(),
-                        startTime.minusMinutes(DEFAULT_DURATION_MINUTES),
-                        endTime)
-                .isEmpty();
-
-        if (doctorHasClash) {
-            throw new IllegalArgumentException("Doctor already has an appointment in the selected time range.");
-        }
 
         Appointment appointment = new Appointment();
         appointment.setPatientId(request.getPatientId());
         appointment.setDoctorId(request.getDoctorId());
-        appointment.setDoctorName(resolveDoctorName(request, doctor));
-        appointment.setDoctorSpecialty(resolveDoctorSpecialty(request, doctor));
-        appointment.setDoctorHospital(resolveDoctorHospital(request, doctor));
-        appointment.setConsultationFee(resolveConsultationFee(request, doctor));
+        appointment.setDoctorName(request.getDoctorName());
+        appointment.setDoctorSpecialty(request.getDoctorSpecialty());
+        appointment.setDoctorHospital(request.getDoctorHospital());
+        appointment.setConsultationFee(request.getConsultationFee());
+        appointment.setConsultationType(request.getConsultationType());
         appointment.setAppointmentDateTime(startTime);
         appointment.setNotes(request.getNotes());
+        appointment.setAppointmentNumber(request.getAppointmentNumber());
         appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
         appointment.setDurationMinutes(DEFAULT_DURATION_MINUTES);
         appointment.setCreatedAt(LocalDateTime.now());
@@ -123,31 +93,11 @@ public class AppointmentService {
         return appointmentRepository.findByStatus(AppointmentStatus.PENDING_PAYMENT);
     }
 
-    private String resolveDoctorName(CreateAppointmentRequest request, DoctorDetails doctor) {
-        if (doctor.getName() != null && !doctor.getName().isBlank()) {
-            return doctor.getName();
+    public boolean permanentlyDeleteAppointment(String id) {
+        if (appointmentRepository.existsById(id)) {
+            appointmentRepository.deleteById(id);
+            return true;
         }
-        return request.getDoctorName();
-    }
-
-    private String resolveDoctorSpecialty(CreateAppointmentRequest request, DoctorDetails doctor) {
-        if (doctor.getSpecialty() != null && !doctor.getSpecialty().isBlank()) {
-            return doctor.getSpecialty();
-        }
-        return request.getDoctorSpecialty();
-    }
-
-    private String resolveDoctorHospital(CreateAppointmentRequest request, DoctorDetails doctor) {
-        if (doctor.getHospitalIds() != null && !doctor.getHospitalIds().isEmpty()) {
-            return String.join(", ", doctor.getHospitalIds());
-        }
-        return request.getDoctorHospital();
-    }
-
-    private double resolveConsultationFee(CreateAppointmentRequest request, DoctorDetails doctor) {
-        if (doctor.getFee() != null) {
-            return doctor.getFee();
-        }
-        return request.getConsultationFee();
+        return false;
     }
 }
