@@ -25,5 +25,9 @@ public class ProcessPaymentRequest {
     @NotNull
     private PaymentMethod paymentMethod;
 
+    private String recipientEmail;
+
+    private String recipientPhone;
+
     private boolean simulateSuccess = true;
 }

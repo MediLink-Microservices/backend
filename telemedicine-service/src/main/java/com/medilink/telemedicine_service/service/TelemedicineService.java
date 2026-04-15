@@ -1,41 +1,81 @@
 package com.medilink.telemedicine_service.service;
 
+import com.medilink.telemedicine_service.model.Telemedicine;
+import com.medilink.telemedicine_service.dto.CreateTelemedicineRequest;
+import com.medilink.telemedicine_service.repository.TelemedicineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
- * TelemedicineService handles the generation of secure Jitsi Meet links.
- * It enforces business rules (e.g. appointment must be confirmed).
+ * TelemedicineService handles telemedicine session management and Jitsi Meet links.
  */
 @Service
 public class TelemedicineService {
 
-    // RestTemplate for calling other microservices (e.g. appointment-service)
+    private final TelemedicineRepository telemedicineRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    /**
-     * Generates a unique Jitsi Meet URL for a specific appointment.
-     * Logic: URL = "https://meet.jit.si/" + AppointmentID + "_" + RandomSuffix
-     */
-    public String generateMeetingUrl(String appointmentId) {
-        // Enforce basic validation - In a real scenario, we call appointment-service here
-        // boolean isConfirmed = checkAppointmentConfirmation(appointmentId);
-        // if (!isConfirmed) throw new RuntimeException("Appointment not confirmed.");
+    @Autowired
+    public TelemedicineService(TelemedicineRepository telemedicineRepository) {
+        this.telemedicineRepository = telemedicineRepository;
+    }
 
-        String uniqueRoom = appointmentId + "-" + UUID.randomUUID().toString().substring(0, 8);
+    /**
+     * Creates a new telemedicine session with Jitsi URL.
+     */
+    public Telemedicine createTelemedicineSession(CreateTelemedicineRequest request) {
+        Telemedicine telemedicine = new Telemedicine();
+        telemedicine.setDoctorId(request.getDoctorId());
+        telemedicine.setPatientId(request.getPatientId());
+        telemedicine.setPatientName(request.getPatientName());
+        telemedicine.setDoctorName(request.getDoctorName());
+        telemedicine.setDoctorSpecialty(request.getDoctorSpecialty());
+        telemedicine.setConsultationType(request.getConsultationType());
+        telemedicine.setAppointmentDateTime(request.getAppointmentDateTime());
+        telemedicine.setDurationMinutes(30);
+        telemedicine.setJitsiUrl(generateMeetingUrl(UUID.randomUUID().toString()));
+        telemedicine.setStatus("SCHEDULED");
+        telemedicine.setNotes(request.getNotes());
+        telemedicine.setCreatedAt(LocalDateTime.now());
+        telemedicine.setUpdatedAt(LocalDateTime.now());
+
+        return telemedicineRepository.save(telemedicine);
+    }
+
+    /**
+     * Gets all telemedicine sessions for a specific doctor.
+     */
+    public List<Telemedicine> getDoctorTelemedicineSessions(String doctorId) {
+        return telemedicineRepository.findByDoctorId(doctorId);
+    }
+
+    /**
+     * Gets all telemedicine sessions for a specific patient.
+     */
+    public List<Telemedicine> getPatientTelemedicineSessions(String patientId) {
+        return telemedicineRepository.findByPatientId(patientId);
+    }
+
+    /**
+     * Generates a unique Jitsi Meet URL for a telemedicine session.
+     */
+    public String generateMeetingUrl(String sessionId) {
+        String uniqueRoom = "medilink-" + sessionId + "-" + UUID.randomUUID().toString().substring(0, 8);
         return "https://meet.jit.si/" + uniqueRoom;
     }
 
     /**
-     * Placeholder for actual service-to-service call to verify appointment status.
-     * Uses internal communication through the API Gateway or direct service calls.
+     * Updates telemedicine session status.
      */
-    private boolean checkAppointmentConfirmation(String appointmentId) {
-        // Example: Call Port 8084 (Appointment Service) to check status
-        // String status = restTemplate.getForObject("http://localhost:8084/api/appointments/" + appointmentId + "/status", String.class);
-        // return "CONFIRMED".equalsIgnoreCase(status);
-        return true; // Simulating confirmed status for demonstration
+    public Telemedicine updateSessionStatus(String sessionId, String status) {
+        return telemedicineRepository.findById(sessionId).map(session -> {
+            session.setStatus(status);
+            session.setUpdatedAt(LocalDateTime.now());
+            return telemedicineRepository.save(session);
+        }).orElse(null);
     }
 }

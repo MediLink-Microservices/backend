@@ -24,17 +24,6 @@ public class AppointmentService {
         LocalDateTime startTime = request.getAppointmentDateTime();
         LocalDateTime endTime = startTime.plusMinutes(DEFAULT_DURATION_MINUTES);
 
-        boolean doctorHasClash = !appointmentRepository
-                .findByDoctorIdAndAppointmentDateTimeBetween(
-                        request.getDoctorId(),
-                        startTime.minusMinutes(DEFAULT_DURATION_MINUTES),
-                        endTime)
-                .isEmpty();
-
-        if (doctorHasClash) {
-            throw new IllegalArgumentException("Doctor already has an appointment in the selected time range.");
-        }
-
         Appointment appointment = new Appointment();
         appointment.setPatientId(request.getPatientId());
         appointment.setDoctorId(request.getDoctorId());
@@ -42,8 +31,10 @@ public class AppointmentService {
         appointment.setDoctorSpecialty(request.getDoctorSpecialty());
         appointment.setDoctorHospital(request.getDoctorHospital());
         appointment.setConsultationFee(request.getConsultationFee());
+        appointment.setConsultationType(request.getConsultationType());
         appointment.setAppointmentDateTime(startTime);
         appointment.setNotes(request.getNotes());
+        appointment.setAppointmentNumber(request.getAppointmentNumber());
         appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
         appointment.setDurationMinutes(DEFAULT_DURATION_MINUTES);
         appointment.setCreatedAt(LocalDateTime.now());
@@ -100,5 +91,13 @@ public class AppointmentService {
 
     public List<Appointment> getPendingAppointments() {
         return appointmentRepository.findByStatus(AppointmentStatus.PENDING_PAYMENT);
+    }
+
+    public boolean permanentlyDeleteAppointment(String id) {
+        if (appointmentRepository.existsById(id)) {
+            appointmentRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

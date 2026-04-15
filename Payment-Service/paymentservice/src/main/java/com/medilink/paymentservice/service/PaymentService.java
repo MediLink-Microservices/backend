@@ -1,6 +1,8 @@
 package com.medilink.paymentservice.service;
 
 import com.medilink.paymentservice.client.AppointmentClient;
+import com.medilink.paymentservice.client.NotificationClient;
+import com.medilink.paymentservice.dto.NotificationRequest;
 import com.medilink.paymentservice.dto.PaymentResponse;
 import com.medilink.paymentservice.dto.ProcessPaymentRequest;
 import com.medilink.paymentservice.model.Payment;
@@ -17,6 +19,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final AppointmentClient appointmentClient;
+    private final NotificationClient notificationClient;
     private final String currency;
     private final String gatewayProvider;
     private final double minimumAmount;
@@ -25,12 +28,14 @@ public class PaymentService {
     public PaymentService(
             PaymentRepository paymentRepository,
             AppointmentClient appointmentClient,
+            NotificationClient notificationClient,
             @Value("${payment.currency}") String currency,
             @Value("${payment.gateway.provider}") String gatewayProvider,
             @Value("${payment.minimum-amount}") double minimumAmount,
             @Value("${payment.maximum-amount}") double maximumAmount) {
         this.paymentRepository = paymentRepository;
         this.appointmentClient = appointmentClient;
+        this.notificationClient = notificationClient;
         this.currency = currency;
         this.gatewayProvider = gatewayProvider;
         this.minimumAmount = minimumAmount;
@@ -61,6 +66,7 @@ public class PaymentService {
             payment.setTransactionReference(generateTransactionReference());
             Payment savedPayment = paymentRepository.save(payment);
             appointmentClient.markAppointmentAsConfirmed(savedPayment.getAppointmentId());
+            triggerSuccessNotification(savedPayment, request);
             return toResponse(savedPayment);
         }
 
@@ -104,6 +110,49 @@ public class PaymentService {
 
     private String generateTransactionReference() {
         return "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    private void triggerSuccessNotification(Payment payment, ProcessPaymentRequest request) {
+        if ((request.getRecipientEmail() == null || request.getRecipientEmail().isBlank())
+                && (request.getRecipientPhone() == null || request.getRecipientPhone().isBlank())) {
+            return;
+        }
+
+        String message = "Your appointment payment was successful. Appointment ID: "
+                + payment.getAppointmentId()
+                + ", Amount: "
+                + payment.getAmount()
+                + " "
+                + payment.getCurrency()
+                + ", Transaction: "
+                + payment.getTransactionReference();
+
+        NotificationRequest notificationRequest = new NotificationRequest(
+                request.getRecipientEmail(),
+                request.getRecipientPhone(),
+                "Appointment Payment Confirmed",
+                message,
+                resolveNotificationType(request),
+                "HIGH");
+
+        try {
+            notificationClient.sendPaymentSuccessNotification(notificationRequest);
+        } catch (Exception exception) {
+            System.err.println("Notification service call failed: " + exception.getMessage());
+        }
+    }
+
+    private String resolveNotificationType(ProcessPaymentRequest request) {
+        boolean hasEmail = request.getRecipientEmail() != null && !request.getRecipientEmail().isBlank();
+        boolean hasPhone = request.getRecipientPhone() != null && !request.getRecipientPhone().isBlank();
+
+        if (hasEmail && hasPhone) {
+            return "BOTH";
+        }
+        if (hasEmail) {
+            return "EMAIL";
+        }
+        return "SMS";
     }
 
     private PaymentResponse toResponse(Payment payment) {

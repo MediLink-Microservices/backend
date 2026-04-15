@@ -16,7 +16,9 @@ public class AppointmentDTO {
     private String doctorName;
     private String doctorSpecialty;
     private double consultationFee;
+    private String consultationType;
     private LocalDateTime appointmentDateTime;
     private AppointmentStatus status;
     private String notes;
+    private Integer appointmentNumber;
 }
