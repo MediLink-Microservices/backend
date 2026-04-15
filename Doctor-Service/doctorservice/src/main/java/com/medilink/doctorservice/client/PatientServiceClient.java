@@ -13,7 +13,7 @@ public class PatientServiceClient {
     private final String patientServiceUrl;
 
     public PatientServiceClient(RestTemplate restTemplate, 
-                               @Value("${services.patient.url:http://localhost:8082}") String patientServiceUrl) {
+                               @Value("${services.patient.url:http://localhost:8086}") String patientServiceUrl) {
         this.restTemplate = restTemplate;
         this.patientServiceUrl = patientServiceUrl;
     }
