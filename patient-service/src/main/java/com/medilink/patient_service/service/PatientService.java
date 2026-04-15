@@ -43,6 +43,13 @@ public class PatientService {
     }
 
     /**
+     * Finds a patient by their NIC (National ID Card).
+     */
+    public Optional<PatientProfile> findByNIC(String NIC) {
+        return patientRepository.findByNIC(NIC);
+    }
+
+    /**
      * Creates or updates a patient profile.
      */
     public PatientProfile saveProfile(PatientProfile profile) {
