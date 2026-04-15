@@ -51,6 +51,16 @@ public class PatientController {
     }
 
     /**
+     * Get a patient by NIC (National ID Card).
+     */
+    @GetMapping("/nic/{nic}")
+    public ResponseEntity<PatientProfile> getPatientByNIC(@PathVariable String nic) {
+        return patientService.findByNIC(nic)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Create or update a patient profile.
      */
     @PostMapping("/profile")
