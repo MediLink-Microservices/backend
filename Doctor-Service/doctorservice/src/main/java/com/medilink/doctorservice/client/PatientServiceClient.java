@@ -20,7 +20,7 @@ public class PatientServiceClient {
 
     public PatientDTO getPatientById(String patientId) {
         try {
-            String url = patientServiceUrl + "/api/patients/" + patientId;
+            String url = patientServiceUrl + "/api/patient/" + patientId;
             return restTemplate.getForObject(url, PatientDTO.class);
         } catch (HttpClientErrorException.NotFound e) {
             throw new RuntimeException("Patient not found with ID: " + patientId);
