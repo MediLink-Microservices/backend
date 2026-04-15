@@ -105,4 +105,14 @@ public class AppointmentController {
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Appointment Service is running");
     }
+
+    @DeleteMapping("/{id}/permanent-delete")
+    public ResponseEntity<String> permanentlyDeleteAppointment(@PathVariable String id) {
+        boolean deleted = appointmentService.permanentlyDeleteAppointment(id);
+        if (deleted) {
+            return ResponseEntity.ok("Appointment permanently deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Appointment not found");
+        }
+    }
 }

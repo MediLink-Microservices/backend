@@ -19,18 +19,25 @@ public class CreateAppointmentRequest {
     @NotBlank
     private String doctorId;
 
+    @NotBlank
     private String doctorName;
 
+    @NotBlank
     private String doctorSpecialty;
 
+    @NotBlank
     private String doctorHospital;
 
     @DecimalMin("0.0")
     private double consultationFee;
+
+    private String consultationType;
 
     @NotNull
     @Future
     private LocalDateTime appointmentDateTime;
 
     private String notes;
+    
+    private Integer appointmentNumber;
 }

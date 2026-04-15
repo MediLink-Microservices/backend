@@ -22,13 +22,13 @@ public class Appointment {
     private String doctorSpecialty;
     private String doctorHospital;
     private double consultationFee;
+    private String consultationType; // e.g., "online", "offline"
 
     private LocalDateTime appointmentDateTime;
     private int durationMinutes;
-
+    private Integer appointmentNumber;
     private AppointmentStatus status;
     private String reasonForCancellation;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String notes;
