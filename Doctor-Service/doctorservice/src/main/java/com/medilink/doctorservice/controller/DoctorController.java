@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class DoctorController {
 
     private final DoctorService service;
