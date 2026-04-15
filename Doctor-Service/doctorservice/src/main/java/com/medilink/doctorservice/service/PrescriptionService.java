@@ -22,9 +22,6 @@ public class PrescriptionService {
     private final PatientServiceClient patientServiceClient;
 
     public PrescriptionDTO createPrescription(PrescriptionRequestDTO prescriptionRequestDTO) {
-        // Validate patient exists by calling patient service
-        PatientDTO patient = patientServiceClient.getPatientById(prescriptionRequestDTO.getPatientId());
-        
         Prescription prescription = Prescription.builder()
                 .doctorId(prescriptionRequestDTO.getDoctorId())
                 .patientId(prescriptionRequestDTO.getPatientId())

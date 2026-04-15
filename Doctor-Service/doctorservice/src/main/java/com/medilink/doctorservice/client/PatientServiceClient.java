@@ -13,14 +13,14 @@ public class PatientServiceClient {
     private final String patientServiceUrl;
 
     public PatientServiceClient(RestTemplate restTemplate, 
-                               @Value("${services.patient.url:http://localhost:8082}") String patientServiceUrl) {
+                               @Value("${services.patient.url:http://localhost:8086}") String patientServiceUrl) {
         this.restTemplate = restTemplate;
         this.patientServiceUrl = patientServiceUrl;
     }
 
     public PatientDTO getPatientById(String patientId) {
         try {
-            String url = patientServiceUrl + "/api/patient/" + patientId;
+            String url = patientServiceUrl + "/api/patients/" + patientId;
             return restTemplate.getForObject(url, PatientDTO.class);
         } catch (HttpClientErrorException.NotFound e) {
             throw new RuntimeException("Patient not found with ID: " + patientId);
