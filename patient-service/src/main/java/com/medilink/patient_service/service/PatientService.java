@@ -50,6 +50,13 @@ public class PatientService {
     }
 
     /**
+     * Finds a patient by auth user ID.
+     */
+    public Optional<PatientProfile> findByAuthUserId(String authUserId) {
+        return patientRepository.findByAuthUserId(authUserId);
+    }
+
+    /**
      * Creates or updates a patient profile.
      */
     public PatientProfile saveProfile(PatientProfile profile) {

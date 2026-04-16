@@ -61,6 +61,16 @@ public class PatientController {
     }
 
     /**
+     * Get a patient by auth user ID.
+     */
+    @GetMapping("/by-auth-user/{authUserId}")
+    public ResponseEntity<PatientProfile> getPatientByAuthUserId(@PathVariable String authUserId) {
+        return patientService.findByAuthUserId(authUserId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Create or update a patient profile.
      */
     @PostMapping("/profile")
