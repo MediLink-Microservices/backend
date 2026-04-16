@@ -242,10 +242,42 @@ public class AuthService {
             map.put("email", u.getEmail());
             map.put("role", u.getRole());
             map.put("isApproved", u.getIsApproved());
+            map.put("phoneNumber", u.getPhoneNumber()); // Included phonenumber
             map.put("createdAt", u.getCreatedAt());
             return map;
         }).collect(java.util.stream.Collectors.toList());
         
         return new ApiResponse("Users fetched", Map.of("users", safeUsers));
+    }
+
+    public ApiResponse updateUserApproval(String userId, boolean approved) {
+        System.out.println("DEBUG: Updating approval for userId: " + userId + " to " + approved);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                System.out.println("DEBUG: User not found with ID: " + userId);
+                return CustomException.userNotFound(userId);
+            });
+        
+        user.setIsApproved(approved);
+        user.setUpdatedAt(LocalDateTime.now());
+        User saved = userRepository.save(user);
+        System.out.println("DEBUG: User saved successfully: " + saved.getId());
+        
+        return new ApiResponse("User approval status updated to " + approved, Map.of("userId", userId, "approved", approved));
+    }
+
+    public ApiResponse updateUserDetails(String userId, Map<String, Object> updates) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> CustomException.userNotFound(userId));
+        
+        if (updates.containsKey("name")) user.setName((String) updates.get("name"));
+        if (updates.containsKey("phoneNumber")) user.setPhoneNumber((String) updates.get("phoneNumber"));
+        if (updates.containsKey("isActive")) user.setIsActive((Boolean) updates.get("isActive"));
+        if (updates.containsKey("role")) user.setRole((String) updates.get("role"));
+        
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        
+        return new ApiResponse("User details updated successfully", Map.of("userId", userId));
     }
 }

@@ -14,11 +14,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
-        System.err.println("GLOBAL EXCEPTION CAUGHT: " + ex.getMessage());
+        System.err.println("GLOBAL EXCEPTION CAUGHT: " + ex.getClass().getName() + ": " + ex.getMessage());
         ex.printStackTrace();
         
         Map<String, Object> body = new HashMap<>();
-        body.put("message", "Global error caught: " + ex.getMessage());
+        body.put("message", "Internal Server Error: " + ex.getMessage());
+        body.put("type", ex.getClass().getSimpleName());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
