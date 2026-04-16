@@ -1,6 +1,7 @@
 package com.medilink.authservice.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,14 @@ public class AuthController {
         ApiResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
+
+    // Admin-only: register any user with auto-approval (no manual approval needed)
+    // @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/register")
+    public ResponseEntity<ApiResponse> adminRegister(@Valid @RequestBody RegisterRequest request) {
+        ApiResponse response = authService.adminRegister(request);
+        return ResponseEntity.ok(response);
+    }
     
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -54,5 +63,18 @@ public class AuthController {
     public ResponseEntity<ApiResponse> refreshToken(@RequestParam String refreshToken) {
         ApiResponse response = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(response);
+    }
+
+    // @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/stats")
+    public ResponseEntity<ApiResponse> getAdminStats() {
+        System.out.println("DEBUG: AuthController reached - getAdminStats");
+        return ResponseEntity.ok(authService.getAdminStats());
+    }
+
+    // @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/users")
+    public ResponseEntity<ApiResponse> getUsersByRole(@RequestParam(required = false, defaultValue = "ALL") String role) {
+        return ResponseEntity.ok(authService.getUsersByRole(role));
     }
 }

@@ -66,6 +66,33 @@ public class AuthService {
             throw CustomException.databaseError("user registration", e);
         }
     }
+
+    // Called by authenticated admins — always auto-approves regardless of role
+    public ApiResponse adminRegister(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw CustomException.emailAlreadyExists(request.getEmail());
+        }
+        if (!request.getRole().matches("PATIENT|DOCTOR|ADMIN")) {
+            throw CustomException.roleNotAllowed(request.getRole());
+        }
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setName(request.getName());
+        user.setRole(request.getRole());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setIsApproved(true);   // Always approved when created by admin
+        user.setIsActive(true);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        try {
+            User savedUser = userRepository.save(user);
+            return new ApiResponse("User created and approved successfully",
+                Map.of("userId", savedUser.getId(), "role", savedUser.getRole(), "approved", true));
+        } catch (Exception e) {
+            throw CustomException.databaseError("admin user registration", e);
+        }
+    }
     
     public AuthResponse login(LoginRequest request) {
         try {
@@ -183,5 +210,42 @@ public class AuthService {
         String newToken = jwtService.generateToken(user.getEmail(), user.getRole(), user.getId());
         
         return new ApiResponse("Token refreshed successfully", Map.of("token", newToken));
+    }
+
+    public ApiResponse getAdminStats() {
+        long doctors = userRepository.countByRole("DOCTOR");
+        long patients = userRepository.countByRole("PATIENT");
+        long admins = userRepository.countByRole("ADMIN");
+        long pending = userRepository.countByRoleAndIsApprovedFalse("DOCTOR");
+        
+        Map<String, Object> stats = new java.util.HashMap<>();
+        stats.put("doctors", doctors);
+        stats.put("patients", patients);
+        stats.put("admins", admins);
+        stats.put("pending", pending);
+        
+        return new ApiResponse("Stats fetched", stats);
+    }
+
+    public ApiResponse getUsersByRole(String role) {
+        java.util.List<User> users;
+        if ("ALL".equals(role)) {
+            users = userRepository.findAll();
+        } else {
+            users = userRepository.findByRole(role);
+        }
+        
+        java.util.List<Map<String, Object>> safeUsers = users.stream().map(u -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", u.getId());
+            map.put("name", u.getName());
+            map.put("email", u.getEmail());
+            map.put("role", u.getRole());
+            map.put("isApproved", u.getIsApproved());
+            map.put("createdAt", u.getCreatedAt());
+            return map;
+        }).collect(java.util.stream.Collectors.toList());
+        
+        return new ApiResponse("Users fetched", Map.of("users", safeUsers));
     }
 }
