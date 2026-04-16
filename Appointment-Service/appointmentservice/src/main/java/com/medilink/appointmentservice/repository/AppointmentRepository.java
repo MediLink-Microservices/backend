@@ -23,4 +23,6 @@ public interface AppointmentRepository extends MongoRepository<Appointment, Stri
     );
 
     List<Appointment> findByPatientIdAndStatus(String patientId, AppointmentStatus status);
+
+    List<Appointment> findByDoctorIdAndAppointmentDateTime(String doctorId, LocalDateTime appointmentDateTime);
 }

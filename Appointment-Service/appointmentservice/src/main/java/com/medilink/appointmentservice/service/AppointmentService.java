@@ -1,5 +1,8 @@
 package com.medilink.appointmentservice.service;
 
+import com.medilink.appointmentservice.client.DoctorServiceClient;
+import com.medilink.appointmentservice.client.PatientServiceClient;
+import com.medilink.appointmentservice.client.dto.DoctorDetails;
 import com.medilink.appointmentservice.dto.CreateAppointmentRequest;
 import com.medilink.appointmentservice.model.Appointment;
 import com.medilink.appointmentservice.model.AppointmentStatus;
@@ -13,28 +16,39 @@ import org.springframework.stereotype.Service;
 public class AppointmentService {
 
     private static final int DEFAULT_DURATION_MINUTES = 30;
+    private static final String DEFAULT_HOSPITAL_LABEL = "Assigned Hospital";
 
     private final AppointmentRepository appointmentRepository;
+    private final PatientServiceClient patientServiceClient;
+    private final DoctorServiceClient doctorServiceClient;
 
-    public AppointmentService(AppointmentRepository appointmentRepository) {
+    public AppointmentService(
+            AppointmentRepository appointmentRepository,
+            PatientServiceClient patientServiceClient,
+            DoctorServiceClient doctorServiceClient) {
         this.appointmentRepository = appointmentRepository;
+        this.patientServiceClient = patientServiceClient;
+        this.doctorServiceClient = doctorServiceClient;
     }
 
     public Appointment createAppointment(CreateAppointmentRequest request) {
         LocalDateTime startTime = request.getAppointmentDateTime();
-        LocalDateTime endTime = startTime.plusMinutes(DEFAULT_DURATION_MINUTES);
+        validateBookingRequest(request, startTime);
+
+        DoctorDetails doctorDetails = doctorServiceClient.getDoctorById(request.getDoctorId());
+        patientServiceClient.getPatientById(request.getPatientId());
 
         Appointment appointment = new Appointment();
         appointment.setPatientId(request.getPatientId());
-        appointment.setDoctorId(request.getDoctorId());
-        appointment.setDoctorName(request.getDoctorName());
-        appointment.setDoctorSpecialty(request.getDoctorSpecialty());
-        appointment.setDoctorHospital(request.getDoctorHospital());
-        appointment.setConsultationFee(request.getConsultationFee());
+        appointment.setDoctorId(doctorDetails.getDoctorId());
+        appointment.setDoctorName(resolveDoctorName(request, doctorDetails));
+        appointment.setDoctorSpecialty(resolveDoctorSpecialty(request, doctorDetails));
+        appointment.setDoctorHospital(resolveDoctorHospital(request));
+        appointment.setConsultationFee(resolveConsultationFee(request, doctorDetails));
         appointment.setConsultationType(request.getConsultationType());
         appointment.setAppointmentDateTime(startTime);
         appointment.setNotes(request.getNotes());
-        appointment.setAppointmentNumber(request.getAppointmentNumber());
+        appointment.setAppointmentNumber(resolveAppointmentNumber(request, startTime));
         appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
         appointment.setDurationMinutes(DEFAULT_DURATION_MINUTES);
         appointment.setCreatedAt(LocalDateTime.now());
@@ -99,5 +113,63 @@ public class AppointmentService {
             return true;
         }
         return false;
+    }
+
+    private void validateBookingRequest(CreateAppointmentRequest request, LocalDateTime appointmentDateTime) {
+        if (request.getConsultationType() == null || request.getConsultationType().isBlank()) {
+            throw new IllegalArgumentException("Consultation type is required.");
+        }
+
+        boolean slotTaken = appointmentRepository.findByDoctorIdAndAppointmentDateTime(
+                        request.getDoctorId(), appointmentDateTime)
+                .stream()
+                .anyMatch(existing -> existing.getStatus() != AppointmentStatus.CANCELLED);
+
+        if (slotTaken) {
+            throw new IllegalStateException("This doctor already has an active appointment for the selected time.");
+        }
+    }
+
+    private String resolveDoctorName(CreateAppointmentRequest request, DoctorDetails doctorDetails) {
+        if (doctorDetails.getName() != null && !doctorDetails.getName().isBlank()) {
+            return doctorDetails.getName();
+        }
+        return request.getDoctorName();
+    }
+
+    private String resolveDoctorSpecialty(CreateAppointmentRequest request, DoctorDetails doctorDetails) {
+        if (doctorDetails.getSpecialty() != null && !doctorDetails.getSpecialty().isBlank()) {
+            return doctorDetails.getSpecialty();
+        }
+        return request.getDoctorSpecialty();
+    }
+
+    private String resolveDoctorHospital(CreateAppointmentRequest request) {
+        if (request.getDoctorHospital() != null && !request.getDoctorHospital().isBlank()) {
+            return request.getDoctorHospital();
+        }
+        return DEFAULT_HOSPITAL_LABEL;
+    }
+
+    private double resolveConsultationFee(CreateAppointmentRequest request, DoctorDetails doctorDetails) {
+        if (doctorDetails.getFee() != null && doctorDetails.getFee() > 0) {
+            return doctorDetails.getFee();
+        }
+        return request.getConsultationFee();
+    }
+
+    private Integer resolveAppointmentNumber(CreateAppointmentRequest request, LocalDateTime appointmentDateTime) {
+        if (request.getAppointmentNumber() != null && request.getAppointmentNumber() > 0) {
+            return request.getAppointmentNumber();
+        }
+
+        return appointmentRepository.findByDoctorId(request.getDoctorId()).stream()
+                .filter(existing -> existing.getAppointmentDateTime() != null)
+                .filter(existing -> existing.getAppointmentDateTime().toLocalDate().equals(appointmentDateTime.toLocalDate()))
+                .filter(existing -> existing.getAppointmentNumber() != null)
+                .filter(existing -> existing.getStatus() != AppointmentStatus.CANCELLED)
+                .mapToInt(Appointment::getAppointmentNumber)
+                .max()
+                .orElse(0) + 1;
     }
 }
