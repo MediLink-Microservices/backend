@@ -1,9 +1,10 @@
 package com.medilink.authservice.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,5 +77,17 @@ public class AuthController {
     @GetMapping("/admin/users")
     public ResponseEntity<ApiResponse> getUsersByRole(@RequestParam(required = false, defaultValue = "ALL") String role) {
         return ResponseEntity.ok(authService.getUsersByRole(role));
+    }
+
+    // @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/users/{userId}/approve")
+    public ResponseEntity<ApiResponse> approveUser(@PathVariable String userId, @RequestParam boolean approved) {
+        return ResponseEntity.ok(authService.updateUserApproval(userId, approved));
+    }
+
+    // @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/users/{userId}")
+    public ResponseEntity<ApiResponse> updateUserDetails(@PathVariable String userId, @RequestBody java.util.Map<String, Object> updates) {
+        return ResponseEntity.ok(authService.updateUserDetails(userId, updates));
     }
 }
