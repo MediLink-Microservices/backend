@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PatientRepository extends MongoRepository<PatientProfile, String> {
     Optional<PatientProfile> findByNIC(String NIC);
+    Optional<PatientProfile> findByAuthUserId(String authUserId);
 }
