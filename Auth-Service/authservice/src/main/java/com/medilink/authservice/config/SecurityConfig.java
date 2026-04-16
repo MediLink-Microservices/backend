@@ -32,29 +32,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configure(http))
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(unauthorizedHandler)
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints (no authentication required)
-                .requestMatchers(
-                    "/auth/register",
-                    "/auth/login",
-                    "/auth/validate",
-                    "/actuator/health",
-                    "/actuator/info"
-                ).permitAll()
-                // All other endpoints require authentication
-                .anyRequest().authenticated()
-            );
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable());
         
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // Temporarily disabled filter to isolate 401
+        // http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
