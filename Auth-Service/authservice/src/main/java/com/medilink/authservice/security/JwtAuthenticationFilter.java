@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             
             if (jwt != null && jwtService.validateToken(jwt)) {
                 String email = jwtService.getEmailFromToken(jwt);
+                logger.debug("JWT validated for email: " + email);
                 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication =
@@ -41,9 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.debug("Authentication set in SecurityContext for: " + email);
+            } else if (jwt != null) {
+                logger.warn("JWT provided but validation failed: " + jwt.substring(0, Math.min(jwt.length(), 10)) + "...");
+            } else {
+                logger.debug("No JWT found in request path: " + request.getServletPath());
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication: ", e);
         }
         
         filterChain.doFilter(request, response);

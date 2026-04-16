@@ -17,15 +17,15 @@
 
     <modules>
         <!-- Member 1 -->
-        <module>api-gateway</module>
-        <module>auth-service</module>
+        <module>Api-Gateway/apigateway</module>
+        <module>Auth-Service/authservice</module>
 
         <!-- Member 2 -->
-        <module>doctor-service</module>
-        <module>ai-symptom-service</module>
+        <module>Doctor-Service/doctorservice</module>
+        <module>Ai-Symptom-Checker/aisymptomchecker</module>
         
         <!-- Member 3 -->
-        <module>appointment-service</module>
+        <module>Appointment-Service/appointmentservice</module>
         <module>telemedicine-service</module>
 
         <!-- Member 4 -->
