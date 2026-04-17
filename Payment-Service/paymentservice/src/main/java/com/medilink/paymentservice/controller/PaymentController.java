@@ -6,10 +6,13 @@ import com.medilink.paymentservice.model.PaymentStatus;
 import com.medilink.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +34,14 @@ public class PaymentController {
     @PostMapping("/process")
     public ResponseEntity<PaymentResponse> processPayment(@Valid @RequestBody ProcessPaymentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.processPayment(request));
+    }
+
+    @PostMapping(value = "/webhook/stripe", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> handleStripeWebhook(
+            @RequestBody String payload,
+            @RequestHeader("Stripe-Signature") String stripeSignature) {
+        paymentService.handleStripeWebhook(payload, stripeSignature);
+        return ResponseEntity.ok(Map.of("status", "received"));
     }
 
     @GetMapping("/{id}")
