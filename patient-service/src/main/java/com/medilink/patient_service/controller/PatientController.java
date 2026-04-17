@@ -113,4 +113,13 @@ public class PatientController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    /**
+     * Delete a medical report by record ID.
+     */
+    @DeleteMapping("/{patientId}/report/{recordId}")
+    public ResponseEntity<Void> deleteMedicalReport(@PathVariable String patientId, @PathVariable String recordId) {
+        patientService.deleteMedicalReport(patientId, recordId);
+        return ResponseEntity.ok().build();
+    }
 }
