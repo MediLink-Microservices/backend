@@ -69,7 +69,7 @@ public class NotificationService {
         System.out.println("Processing EMAIL notification to: " + request.getRecipientEmail());
 
         // Only send if we have legitimate a recipient (can be commented for actual use)
-        // mailSender.send(mailMessage);
+        mailSender.send(mailMessage);
     }
 
     /**
