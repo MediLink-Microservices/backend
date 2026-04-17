@@ -50,6 +50,13 @@ public class PatientService {
     }
 
     /**
+     * Finds a patient by auth user ID.
+     */
+    public Optional<PatientProfile> findByAuthUserId(String authUserId) {
+        return patientRepository.findByAuthUserId(authUserId);
+    }
+
+    /**
      * Creates or updates a patient profile.
      */
     public PatientProfile saveProfile(PatientProfile profile) {
@@ -70,7 +77,8 @@ public class PatientService {
         // Upload the file to Cloudinary with specific tags or folders
         Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                 "resource_type", "auto",
-                "folder", "medilink/reports/" + patientId
+                "folder", "medilink/reports/" + patientId,
+                "access_mode", "public"
         ));
 
         // Create MedicalRecord metadata with Cloudinary URL
@@ -85,6 +93,15 @@ public class PatientService {
         PatientProfile patient = findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
         patient.getMedicalReports().add(record);
         return patientRepository.save(patient);
+    }
+
+    /**
+     * Delete a medical report by record ID.
+     */
+    public void deleteMedicalReport(String patientId, String recordId) {
+        PatientProfile patient = findById(patientId).orElseThrow(() -> new RuntimeException("Patient not found"));
+        patient.getMedicalReports().removeIf(report -> report.getRecordId().equals(recordId));
+        patientRepository.save(patient);
     }
 
 

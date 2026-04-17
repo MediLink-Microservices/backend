@@ -65,6 +65,26 @@ public class AppointmentService {
         return appointmentRepository.findByPatientId(patientId);
     }
 
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .sorted((first, second) -> {
+                    LocalDateTime firstDate = first.getAppointmentDateTime();
+                    LocalDateTime secondDate = second.getAppointmentDateTime();
+
+                    if (firstDate == null && secondDate == null) {
+                        return 0;
+                    }
+                    if (firstDate == null) {
+                        return 1;
+                    }
+                    if (secondDate == null) {
+                        return -1;
+                    }
+                    return secondDate.compareTo(firstDate);
+                })
+                .toList();
+    }
+
     public List<Appointment> getDoctorAppointments(String doctorId) {
         return appointmentRepository.findByDoctorId(doctorId);
     }

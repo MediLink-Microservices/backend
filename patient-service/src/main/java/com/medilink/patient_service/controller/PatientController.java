@@ -61,6 +61,16 @@ public class PatientController {
     }
 
     /**
+     * Get a patient by auth user ID.
+     */
+    @GetMapping("/by-auth-user/{authUserId}")
+    public ResponseEntity<PatientProfile> getPatientByAuthUserId(@PathVariable String authUserId) {
+        return patientService.findByAuthUserId(authUserId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Create or update a patient profile.
      */
     @PostMapping("/profile")
@@ -102,5 +112,14 @@ public class PatientController {
             // Handle patient not found or other runtime exceptions
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Delete a medical report by record ID.
+     */
+    @DeleteMapping("/{patientId}/report/{recordId}")
+    public ResponseEntity<Void> deleteMedicalReport(@PathVariable String patientId, @PathVariable String recordId) {
+        patientService.deleteMedicalReport(patientId, recordId);
+        return ResponseEntity.ok().build();
     }
 }
