@@ -38,18 +38,26 @@ class DoctorServiceTest {
                 .doctorId("1")
                 .name("Dr. John Doe")
                 .email("john.doe@example.com")
+                .phone("+94771234567")
+                .licenseNumber("DOC-1001")
+                .yearsOfExperience(12)
                 .specialty("Cardiology")
-                .hospital("General Hospital")
+                .hospitalIds(List.of("hospital-1"))
                 .fee(500.0)
+                .availableForTelemedicine(true)
                 .status(DoctorStatus.PENDING)
                 .build();
 
         doctorRequestDTO = DoctorRequestDTO.builder()
                 .name("Dr. John Doe")
                 .email("john.doe@example.com")
+                .phone("+94771234567")
+                .licenseNumber("DOC-1001")
+                .yearsOfExperience(12)
                 .specialty("Cardiology")
-                .hospital("General Hospital")
+                .hospitalIds(List.of("hospital-1"))
                 .fee(500.0)
+                .availableForTelemedicine(true)
                 .build();
     }
 
@@ -63,6 +71,8 @@ class DoctorServiceTest {
         assertEquals("Dr. John Doe", result.getName());
         assertEquals("john.doe@example.com", result.getEmail());
         assertEquals("Cardiology", result.getSpecialty());
+        assertEquals("+94771234567", result.getPhone());
+        assertEquals(List.of("hospital-1"), result.getHospitalIds());
         assertEquals(DoctorStatus.PENDING, result.getStatus());
         verify(doctorRepository, times(1)).save(any(Doctor.class));
     }

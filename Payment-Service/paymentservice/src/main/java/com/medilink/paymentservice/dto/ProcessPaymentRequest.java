@@ -25,9 +25,11 @@ public class ProcessPaymentRequest {
     @NotNull
     private PaymentMethod paymentMethod;
 
+    // Backward-compatible with the previous demo-payment UI payload.
+    // Stripe flow ignores this value, but accepting it avoids 400s from stale clients.
+    private Boolean simulateSuccess;
+
     private String recipientEmail;
 
     private String recipientPhone;
-
-    private boolean simulateSuccess = true;
 }
