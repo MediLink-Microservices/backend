@@ -24,6 +24,10 @@ public class Payment {
     private PaymentStatus status;
     private String transactionReference;
     private String gatewayProvider;
+    private String checkoutSessionId;
+    private String checkoutUrl;
+    private String recipientEmail;
+    private String recipientPhone;
     private String failureReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

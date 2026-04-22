@@ -21,6 +21,9 @@ public class PaymentResponse {
     private PaymentMethod paymentMethod;
     private PaymentStatus status;
     private String transactionReference;
+    private String gatewayProvider;
+    private String checkoutSessionId;
+    private String checkoutUrl;
     private String failureReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
