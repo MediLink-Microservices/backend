@@ -49,6 +49,12 @@ public class PrescriptionController {
         return ResponseEntity.ok(prescriptions);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PrescriptionDTO> updatePrescription(@PathVariable String id, @Valid @RequestBody PrescriptionRequestDTO prescriptionDTO) {
+        PrescriptionDTO updatedPrescription = service.updatePrescription(id, prescriptionDTO);
+        return ResponseEntity.ok(updatedPrescription);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePrescription(@PathVariable String id) {
         service.deletePrescription(id);
