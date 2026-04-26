@@ -35,8 +35,7 @@ public class NotificationService {
      */
     @PostConstruct
     public void initTwilio() {
-        // Only initialize if we have actual credentials (avoiding errors in test or
-        // dev)
+        // Only initialize if we have actual credentials (avoiding errors in testing ,dev)
         if (twilioSid != null && !twilioSid.isEmpty() && !twilioSid.equals("your_sid")) {
             Twilio.init(twilioSid, twilioAuthToken);
         }
@@ -68,7 +67,7 @@ public class NotificationService {
         // Log actually attempting to send (to help in debugging)
         System.out.println("Processing EMAIL notification to: " + request.getRecipientEmail());
 
-        // Only send if we have legitimate a recipient (can be commented for actual use)
+
         mailSender.send(mailMessage);
     }
 
