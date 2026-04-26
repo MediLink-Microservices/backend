@@ -1,0 +1,37 @@
+services:
+  mongo-appointment:
+    image: mongo:7.0
+    container_name: mongo-appointment
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: appointment_db
+    volumes:
+      - mongo-appointment-data:/data/db
+    networks:
+      - healthcare-network
+
+  appointment-service:
+    build: .
+    container_name: appointment-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mongo-appointment
+    environment:
+      SPRING_MONGODB_URI: mongodb://admin:admin123@mongo-appointment:27017/appointment_db?authSource=admin
+      SERVICES_DOCTOR_URL: http://host.docker.internal:8083
+      SERVICES_PATIENT_URL: http://host.docker.internal:8086
+      SERVER_PORT: 8084
+      SERVER_SERVLET_CONTEXT_PATH: /api
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
+
+volumes:
+  mongo-appointment-data:

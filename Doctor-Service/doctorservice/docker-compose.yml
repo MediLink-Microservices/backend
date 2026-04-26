@@ -1,0 +1,37 @@
+services:
+  mongo-doctor:
+    image: mongo:7.0
+    container_name: mongo-doctor
+    profiles: ["local-db"]
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: doctor_db
+    volumes:
+      - mongo-doctor-data:/data/db
+    networks:
+      - healthcare-network
+
+  doctor-service:
+    build: .
+    container_name: doctor-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb+srv://newhasaranga2002_db_user:WnfA1npol3E0DRBn@cluster0.pld4jxk.mongodb.net/doctor_db
+      SERVICES_AUTH_URL: http://host.docker.internal:8081
+      SERVICES_PATIENT_URL: http://host.docker.internal:8086
+      SERVICES_APPOINTMENT_URL: http://host.docker.internal:8084
+      SERVER_PORT: 8083
+      SERVER_SERVLET_CONTEXT_PATH: /
+    networks:
+      - healthcare-network
+
+networks:
+  healthcare-network:
+    driver: bridge
+
+volumes:
+  mongo-doctor-data:

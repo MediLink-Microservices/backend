@@ -29,7 +29,7 @@ public class AppointmentClient {
 
     private void updateAppointmentStatus(String appointmentId, String status) {
         restClient.put()
-                .uri(appointmentServiceBaseUrl + "/api/appointments/{id}/status?status={status}", appointmentId, status)
+                .uri(appointmentServiceBaseUrl + "/appointments/{id}/status?status={status}", appointmentId, status)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (request, response) -> {
                     throw new IllegalStateException("Failed to update appointment status. HTTP " + response.getStatusCode());
