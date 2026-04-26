@@ -62,6 +62,20 @@ public class PrescriptionService {
                 .collect(Collectors.toList());
     }
 
+    public PrescriptionDTO updatePrescription(String prescriptionId, PrescriptionRequestDTO prescriptionRequestDTO) {
+        Prescription existingPrescription = prescriptionRepository.findById(prescriptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescription not found with id: " + prescriptionId));
+        
+        existingPrescription.setDiagnosis(prescriptionRequestDTO.getDiagnosis());
+        existingPrescription.setMedicines(prescriptionRequestDTO.getMedicines());
+        existingPrescription.setDosageInstructions(prescriptionRequestDTO.getDosageInstructions());
+        existingPrescription.setDuration(prescriptionRequestDTO.getDuration());
+        existingPrescription.setNotes(prescriptionRequestDTO.getNotes());
+        
+        Prescription updatedPrescription = prescriptionRepository.save(existingPrescription);
+        return convertToDTO(updatedPrescription);
+    }
+
     public void deletePrescription(String prescriptionId) {
         if (!prescriptionRepository.existsById(prescriptionId)) {
             throw new ResourceNotFoundException("Prescription not found with id: " + prescriptionId);
