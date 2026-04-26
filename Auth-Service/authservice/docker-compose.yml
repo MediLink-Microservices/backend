@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongo-auth:
     image: mongo:7.0
@@ -24,7 +22,7 @@ services:
       - healthcare-network
 
   auth-service:
-    build: ./auth-service
+    build: .
     container_name: auth-service
     ports:
       - "8081:8081"
@@ -32,10 +30,7 @@ services:
       - mongo-auth
       - redis-auth
     environment:
-      SPRING_DATA_MONGODB_HOST: mongo-auth
-      SPRING_DATA_MONGODB_PORT: 27017
-      SPRING_DATA_MONGODB_USERNAME: admin
-      SPRING_DATA_MONGODB_PASSWORD: admin123
+      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@mongo-auth:27017/auth_db?authSource=admin
       SPRING_DATA_REDIS_HOST: redis-auth
       SPRING_DATA_REDIS_PORT: 6379
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
