@@ -28,6 +28,7 @@ public class Appointment {
     private int durationMinutes;
     private Integer appointmentNumber;
     private AppointmentStatus status;
+    private DoctorStatus doctorStatus;
     private String reasonForCancellation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

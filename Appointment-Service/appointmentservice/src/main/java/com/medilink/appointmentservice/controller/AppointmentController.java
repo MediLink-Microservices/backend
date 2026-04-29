@@ -3,6 +3,7 @@ package com.medilink.appointmentservice.controller;
 import com.medilink.appointmentservice.dto.CreateAppointmentRequest;
 import com.medilink.appointmentservice.model.Appointment;
 import com.medilink.appointmentservice.model.AppointmentStatus;
+import com.medilink.appointmentservice.model.DoctorStatus;
 import com.medilink.appointmentservice.service.AppointmentService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -97,6 +98,15 @@ public class AppointmentController {
             @PathVariable String id,
             @RequestParam AppointmentStatus status) {
         return appointmentService.updateAppointmentStatus(id, status)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PutMapping("/{id}/doctor-status")
+    public ResponseEntity<Appointment> updateDoctorStatus(
+            @PathVariable String id,
+            @RequestParam DoctorStatus doctorStatus) {
+        return appointmentService.updateDoctorStatus(id, doctorStatus)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }

@@ -6,6 +6,7 @@ import com.medilink.appointmentservice.client.dto.DoctorDetails;
 import com.medilink.appointmentservice.dto.CreateAppointmentRequest;
 import com.medilink.appointmentservice.model.Appointment;
 import com.medilink.appointmentservice.model.AppointmentStatus;
+import com.medilink.appointmentservice.model.DoctorStatus;
 import com.medilink.appointmentservice.repository.AppointmentRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,6 +51,7 @@ public class AppointmentService {
         appointment.setNotes(request.getNotes());
         appointment.setAppointmentNumber(resolveAppointmentNumber(request, startTime));
         appointment.setStatus(AppointmentStatus.PENDING_PAYMENT);
+        appointment.setDoctorStatus(DoctorStatus.AWAITING);
         appointment.setDurationMinutes(DEFAULT_DURATION_MINUTES);
         appointment.setCreatedAt(LocalDateTime.now());
         appointment.setUpdatedAt(LocalDateTime.now());
@@ -96,6 +98,14 @@ public class AppointmentService {
     public Optional<Appointment> updateAppointmentStatus(String id, AppointmentStatus status) {
         return appointmentRepository.findById(id).map(existing -> {
             existing.setStatus(status);
+            existing.setUpdatedAt(LocalDateTime.now());
+            return appointmentRepository.save(existing);
+        });
+    }
+
+    public Optional<Appointment> updateDoctorStatus(String id, DoctorStatus doctorStatus) {
+        return appointmentRepository.findById(id).map(existing -> {
+            existing.setDoctorStatus(doctorStatus);
             existing.setUpdatedAt(LocalDateTime.now());
             return appointmentRepository.save(existing);
         });

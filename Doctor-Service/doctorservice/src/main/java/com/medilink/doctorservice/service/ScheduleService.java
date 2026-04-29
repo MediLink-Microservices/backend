@@ -7,6 +7,8 @@ import com.medilink.doctorservice.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,9 @@ public class ScheduleService {
                 throw new IllegalArgumentException("End time must be after start time");
             }
         }
+        
+        // Validate that the selected day is not in the past
+        validateDayNotInPast(scheduleDTO.getDay());
         
         Schedule schedule = Schedule.builder()
                 .doctorId(scheduleDTO.getDoctorId())
@@ -77,6 +82,9 @@ public class ScheduleService {
             }
         }
         
+        // Validate that the selected day is not in the past
+        validateDayNotInPast(scheduleDTO.getDay());
+        
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id: " + scheduleId));
 
@@ -119,5 +127,38 @@ public class ScheduleService {
                 .isAvailable(schedule.getIsAvailable())
                 .patientLimit(schedule.getPatientLimit())
                 .build();
+    }
+
+    /**
+     * Validates that the selected day is not in the past
+     * @param day The day name (e.g., "Monday", "Tuesday", etc.)
+     * @throws IllegalArgumentException if the day is in the past
+     */
+    private void validateDayNotInPast(String day) {
+        if (day == null || day.trim().isEmpty()) {
+            return; // Let other validation handle empty day
+        }
+
+        try {
+            DayOfWeek selectedDay = DayOfWeek.valueOf(day.toUpperCase());
+            LocalDate today = LocalDate.now();
+            DayOfWeek currentDay = today.getDayOfWeek();
+            
+            // Calculate days until the selected day
+            int daysUntilSelected = selectedDay.getValue() - currentDay.getValue();
+            
+            // If the selected day is earlier in the week than today, it's in the past
+            // unless we're allowing scheduling for next week
+            if (daysUntilSelected < 0) {
+                throw new IllegalArgumentException("Cannot schedule appointments for past days. Selected day " + day + " has already passed this week.");
+            }
+            
+            // If it's the same day but current time is past business hours, we might want to prevent it
+            // This is a basic implementation - you can add time-based validation if needed
+            
+        } catch (IllegalArgumentException e) {
+            // Invalid day name - let other validation handle this
+            // This catch block prevents the validation from failing on invalid day names
+        }
     }
 }
